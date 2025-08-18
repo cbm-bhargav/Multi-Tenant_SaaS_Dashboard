@@ -1,34 +1,31 @@
-import { PrismaClient } from '@prisma/client';
+// app/lib/prisma.ts
+import { PrismaClient } from '@/lib/prisma-master';
+import { PrismaClient as ProjectPrisma } from '@/lib/prisma-project';
 
-declare global {
-  var prisma: PrismaClient | undefined;
-}
+// Global declaration to prevent multiple instances in development
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+  projectClients: Map<string, ProjectPrisma> | undefined;
+};
 
-export const prisma = globalThis.prisma || new PrismaClient();
+// Master client (singleton pattern for development)
+export const prisma = globalForPrisma.prisma ?? new PrismaClient();
 
-if (process.env.NODE_ENV !== 'production') globalThis.prisma = prisma;
+// Project clients cache
+const projectClientsCache = globalForPrisma.projectClients ?? new Map<string, ProjectPrisma>();
 
-// Dynamic Prisma clients for project databases
-const projectClients = new Map<string, PrismaClient>();
-
-export function getProjectPrismaClient(databaseUrl: string): PrismaClient {
-  if (!projectClients.has(databaseUrl)) {
-    const client = new PrismaClient({
-      datasources: {
-        db: {
-          url: databaseUrl,
-        },
-      },
+export function getProjectPrismaClient(databaseUrl: string): ProjectPrisma {
+  if (!projectClientsCache.has(databaseUrl)) {
+    const client = new ProjectPrisma({
+      datasources: { db: { url: databaseUrl } },
     });
-    projectClients.set(databaseUrl, client);
+    projectClientsCache.set(databaseUrl, client);
   }
-  return projectClients.get(databaseUrl)!;
+  return projectClientsCache.get(databaseUrl)!;
 }
 
-export async function disconnectProjectClient(databaseUrl: string): Promise<void> {
-  const client = projectClients.get(databaseUrl);
-  if (client) {
-    await client.$disconnect();
-    projectClients.delete(databaseUrl);
-  }
+// Store in global in development to prevent re-initialization
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma;
+  globalForPrisma.projectClients = projectClientsCache;
 }

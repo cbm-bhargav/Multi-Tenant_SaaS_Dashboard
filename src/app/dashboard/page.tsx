@@ -1,14 +1,8 @@
-// import Dashboard from '@/app/components/Dashboard';
-
-// export default function HomePage() {
-//   return <Dashboard />;
-// }
-
 // app/dashboard/page.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Database, Users, Eye } from 'lucide-react';
+import { Plus, Database, Users, Eye, Trash2, Edit2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { Project } from '@/types';
 
@@ -18,6 +12,8 @@ const Dashboard: React.FC = () => {
   const [creating, setCreating] = useState(false);
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [updatingProject, setUpdatingProject] = useState(false);
   const router = useRouter();
 
   // Load projects on mount
@@ -77,6 +73,14 @@ const Dashboard: React.FC = () => {
     router.push(`/dashboard/projects/${projectId}`);
   };
 
+  const startEditing = (project: Project) => {
+    setEditingProject({ ...project });
+  };
+
+  const cancelEditing = () => {
+    setEditingProject(null);
+  };
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
@@ -132,30 +136,32 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map(project => (
             <div key={project.id} className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center">
-                  <Database className="w-8 h-8 text-blue-500 mr-3"/>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800">{project.name}</h3>
-                    <p className="text-sm text-gray-500">ID: {project.id}</p>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center">
+                      <Database className="w-8 h-8 text-blue-500 mr-3"/>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-800">{project.name}</h3>
+                        <p className="text-sm text-gray-500">ID: {project.id}</p>
+                      </div>
+                    </div>
+                    <div className="flex space-x-1">
+                      <button 
+                        onClick={() => handleViewProject(project.id)} 
+                        className="p-2 text-blue-500 hover:bg-blue-50 rounded" 
+                        title="View Project"
+                      >
+                        <Eye className="w-4 h-4"/>
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <button 
-                  onClick={() => handleViewProject(project.id)} 
-                  className="p-2 text-blue-500 hover:bg-blue-50 rounded" 
-                  title="View Project"
-                >
-                  <Eye className="w-4 h-4"/>
-                </button>
-              </div>
 
-              <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
-                <div className="flex items-center">
-                  <Users className="w-4 h-4 mr-1"/>
-                  Database ready
-                </div>
-                <span>{new Date(project.createdAt).toLocaleDateString()}</span>
-              </div>
+                  <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
+                    <div className="flex items-center">
+                      <Users className="w-4 h-4 mr-1"/>
+                      Database ready
+                    </div>
+                    <span>{new Date(project.createdAt).toLocaleDateString()}</span>
+                  </div>
             </div>
           ))}
         </div>

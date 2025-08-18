@@ -4,7 +4,6 @@ import { prisma } from '@/app/lib/prisma';
 import { createNeonProject } from '@/app/lib/neon';
 import { initializeProjectDatabase } from '@/app/lib/project-init';
 import type { CreateProjectRequest, Project } from '@/types';
-import { Console } from 'console';
 
 export async function GET(): Promise<NextResponse<Project[] | { error: string }>> {
   try {
