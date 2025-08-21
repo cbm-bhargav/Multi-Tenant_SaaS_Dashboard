@@ -8,7 +8,7 @@ const globalForPrisma = globalThis as unknown as {
   projectClients: Map<string, ProjectPrisma> | undefined;
 };
 
-// Master client (singleton pattern for development)
+// Master client
 export const prisma = globalForPrisma.prisma ?? new PrismaClient();
 
 // Project clients cache

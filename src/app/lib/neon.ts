@@ -1,75 +1,124 @@
-import { PrismaClient } from "@prisma/client";
-
-interface NeonProjectResult {
+// lib/neon.ts
+interface CreateNeonProjectResponse {
   neonProjectId: string;
   databaseUrl: string;
+  projectName: string;
 }
 
-export async function createNeonProject(projectName: string) {
+export async function createNeonProject(
+  name: string
+): Promise<CreateNeonProjectResponse> {
   try {
-    const res = await fetch('https://console.neon.tech/api/v2/projects', {
-      method: 'POST',
+    if (!process.env.NEON_API_KEY) {
+      throw new Error("NEON_API_KEY environment variable is required");
+    }
+
+    if (!process.env.NEON_ORG_ID) {
+      throw new Error(
+        "NEON_ORG_ID environment variable is required. Get it from your Neon organization settings page."
+      );
+    }
+
+    console.log("🚀 Creating Neon project:", name);
+
+    // Create project using Neon API with org_id
+    const response = await fetch("https://console.neon.tech/api/v2/projects", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.NEON_API_KEY}`,
+        Authorization: `Bearer ${process.env.NEON_API_KEY}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
       body: JSON.stringify({
         project: {
-          name: projectName,
-          org_id: process.env.NEON_ORG_ID,  // some endpoints require this
-          region_id: 'aws-ap-southeast-1', // choose your region
-          postgres_version: '17',   // optional, specify version
+          name,
+          org_id: process.env.NEON_ORG_ID,
+          region_id: process.env.NEON_REGION_ID || "aws-us-east-1",
         },
       }),
     });
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.message || 'Failed to create Neon project');
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Neon API Error Response:", errorText);
+      throw new Error(
+        `Failed to create Neon project: ${response.status} - ${errorText}`
+      );
     }
 
-    const neonProjectId = data.id;
-    const databaseUrl = data.connection_uris[0].connection_uri;
-    console.log('**********************************************************',databaseUrl)
+    const data = await response.json();
+    console.log("✅ Neon project created successfully");
 
-    return { neonProjectId, databaseUrl };
-  } catch (error) {
-    console.error('Failed to create Neon project:', error);
-    throw new Error('Failed to create Neon project');
-  }
-}
+    const project = data.project;
+    const defaultEndpoint = data.endpoints?.[0];
+    const defaultDatabase = data.databases?.[0];
+    const defaultRole = data.roles?.[0]; // This contains the database credentials
 
-async function waitForNeonProjectReady(databaseUrl: string) {
-  let attempts = 0;
-  while (attempts < 10) {
-    try {
-      const projectPrisma = new PrismaClient({
-        datasources: { db: { url: databaseUrl } }
+    if (!defaultEndpoint || !defaultDatabase || !defaultRole) {
+      console.error("Missing required data from Neon response:", {
+        endpoint: !!defaultEndpoint,
+        database: !!defaultDatabase,
+        role: !!defaultRole,
       });
-      await projectPrisma.$queryRaw`SELECT 1`;
-      await projectPrisma.$disconnect();
-      return true;
-    } catch {
-      await new Promise(r => setTimeout(r, 2000)); // wait 2s
-      attempts++;
+      throw new Error("Failed to get required data from Neon response");
     }
+
+    console.log("📊 Project details:");
+    console.log(`   Project ID: ${project.id}`);
+    console.log(`   Endpoint: ${defaultEndpoint.host}`);
+    console.log(`   Database: ${defaultDatabase.name}`);
+    console.log(`   Role: ${defaultRole.name}`);
+
+    // Construct the complete database URL with credentials
+    const databaseUrl = `postgresql://${defaultRole.name}:${defaultRole.password}@${defaultEndpoint.host}/${defaultDatabase.name}?sslmode=require`;
+
+    console.log("🔗 Database URL constructed successfully");
+
+    return {
+      neonProjectId: project.id,
+      databaseUrl,
+      projectName: project.name,
+    };
+  } catch (error) {
+    console.error("❌ Error creating Neon project:", error);
+    throw new Error(
+      `Failed to create Neon project: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
   }
-  throw new Error('Neon project DB not ready in time');
 }
 
-export async function deleteNeonProject(neonProjectId: string): Promise<void> {
-  try {
-    const res = await fetch(`https://console.neon.tech/api/v2/projects/${neonProjectId}`, {
-      method: "DELETE",
-      headers: {
-        "Authorization": `Bearer ${process.env.NEON_API_KEY}`,
-      },
-    });
 
-    if (!res.ok) throw new Error("Failed to delete Neon project");
+
+// Alternative function to get connection details separately
+export async function getNeonProjectDetails(projectId: string) {
+  try {
+    if (!process.env.NEON_API_KEY) {
+      throw new Error("NEON_API_KEY environment variable is required");
+    }
+
+    const response = await fetch(
+      `https://console.neon.tech/api/v2/projects/${projectId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.NEON_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to get project details: ${response.status} - ${errorText}`
+      );
+    }
+
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error("Failed to delete Neon project:", error);
-    throw new Error("Failed to delete Neon project");
+    console.error("Error getting project details:", error);
+    throw error;
   }
 }

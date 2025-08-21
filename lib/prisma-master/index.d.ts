@@ -880,6 +880,7 @@ export namespace Prisma {
     id: number | null
     name: string | null
     databaseUrl: string | null
+    neonProjectId: string | null
     createdAt: Date | null
   }
 
@@ -887,6 +888,7 @@ export namespace Prisma {
     id: number | null
     name: string | null
     databaseUrl: string | null
+    neonProjectId: string | null
     createdAt: Date | null
   }
 
@@ -894,6 +896,7 @@ export namespace Prisma {
     id: number
     name: number
     databaseUrl: number
+    neonProjectId: number
     createdAt: number
     _all: number
   }
@@ -911,6 +914,7 @@ export namespace Prisma {
     id?: true
     name?: true
     databaseUrl?: true
+    neonProjectId?: true
     createdAt?: true
   }
 
@@ -918,6 +922,7 @@ export namespace Prisma {
     id?: true
     name?: true
     databaseUrl?: true
+    neonProjectId?: true
     createdAt?: true
   }
 
@@ -925,6 +930,7 @@ export namespace Prisma {
     id?: true
     name?: true
     databaseUrl?: true
+    neonProjectId?: true
     createdAt?: true
     _all?: true
   }
@@ -1019,6 +1025,7 @@ export namespace Prisma {
     id: number
     name: string
     databaseUrl: string
+    neonProjectId: string
     createdAt: Date
     _count: ProjectCountAggregateOutputType | null
     _avg: ProjectAvgAggregateOutputType | null
@@ -1045,6 +1052,7 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     databaseUrl?: boolean
+    neonProjectId?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["project"]>
 
@@ -1052,6 +1060,7 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     databaseUrl?: boolean
+    neonProjectId?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["project"]>
 
@@ -1059,6 +1068,7 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     databaseUrl?: boolean
+    neonProjectId?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["project"]>
 
@@ -1066,10 +1076,11 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     databaseUrl?: boolean
+    neonProjectId?: boolean
     createdAt?: boolean
   }
 
-  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "databaseUrl" | "createdAt", ExtArgs["result"]["project"]>
+  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "databaseUrl" | "neonProjectId" | "createdAt", ExtArgs["result"]["project"]>
 
   export type $ProjectPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Project"
@@ -1078,6 +1089,7 @@ export namespace Prisma {
       id: number
       name: string
       databaseUrl: string
+      neonProjectId: string
       createdAt: Date
     }, ExtArgs["result"]["project"]>
     composites: {}
@@ -1505,6 +1517,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Project", 'Int'>
     readonly name: FieldRef<"Project", 'String'>
     readonly databaseUrl: FieldRef<"Project", 'String'>
+    readonly neonProjectId: FieldRef<"Project", 'String'>
     readonly createdAt: FieldRef<"Project", 'DateTime'>
   }
     
@@ -1890,6 +1903,7 @@ export namespace Prisma {
     id: 'id',
     name: 'name',
     databaseUrl: 'databaseUrl',
+    neonProjectId: 'neonProjectId',
     createdAt: 'createdAt'
   };
 
@@ -1983,6 +1997,7 @@ export namespace Prisma {
     id?: IntFilter<"Project"> | number
     name?: StringFilter<"Project"> | string
     databaseUrl?: StringFilter<"Project"> | string
+    neonProjectId?: StringFilter<"Project"> | string
     createdAt?: DateTimeFilter<"Project"> | Date | string
   }
 
@@ -1990,6 +2005,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     databaseUrl?: SortOrder
+    neonProjectId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -2000,6 +2016,7 @@ export namespace Prisma {
     NOT?: ProjectWhereInput | ProjectWhereInput[]
     name?: StringFilter<"Project"> | string
     databaseUrl?: StringFilter<"Project"> | string
+    neonProjectId?: StringFilter<"Project"> | string
     createdAt?: DateTimeFilter<"Project"> | Date | string
   }, "id">
 
@@ -2007,6 +2024,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     databaseUrl?: SortOrder
+    neonProjectId?: SortOrder
     createdAt?: SortOrder
     _count?: ProjectCountOrderByAggregateInput
     _avg?: ProjectAvgOrderByAggregateInput
@@ -2022,12 +2040,14 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"Project"> | number
     name?: StringWithAggregatesFilter<"Project"> | string
     databaseUrl?: StringWithAggregatesFilter<"Project"> | string
+    neonProjectId?: StringWithAggregatesFilter<"Project"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
   }
 
   export type ProjectCreateInput = {
     name: string
     databaseUrl: string
+    neonProjectId: string
     createdAt?: Date | string
   }
 
@@ -2035,12 +2055,14 @@ export namespace Prisma {
     id?: number
     name: string
     databaseUrl: string
+    neonProjectId: string
     createdAt?: Date | string
   }
 
   export type ProjectUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
     databaseUrl?: StringFieldUpdateOperationsInput | string
+    neonProjectId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -2048,6 +2070,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     databaseUrl?: StringFieldUpdateOperationsInput | string
+    neonProjectId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -2055,12 +2078,14 @@ export namespace Prisma {
     id?: number
     name: string
     databaseUrl: string
+    neonProjectId: string
     createdAt?: Date | string
   }
 
   export type ProjectUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
     databaseUrl?: StringFieldUpdateOperationsInput | string
+    neonProjectId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -2068,6 +2093,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     databaseUrl?: StringFieldUpdateOperationsInput | string
+    neonProjectId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -2112,6 +2138,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     databaseUrl?: SortOrder
+    neonProjectId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -2123,6 +2150,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     databaseUrl?: SortOrder
+    neonProjectId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -2130,6 +2158,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     databaseUrl?: SortOrder
+    neonProjectId?: SortOrder
     createdAt?: SortOrder
   }
 
